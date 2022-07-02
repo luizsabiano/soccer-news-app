@@ -7,23 +7,48 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.soccernews.data.remote.SoccerNewsApi;
 import br.com.soccernews.domain.News;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewsViewModel extends ViewModel {
 
-    private MutableLiveData<List<News>> news;
+    private MutableLiveData<List<News>> news = new MutableLiveData<>();
+
+    private final SoccerNewsApi api;
 
     public NewsViewModel() {
-        this.news = new MutableLiveData<>();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://luizsabiano.github.io/mock_handicraft/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        // TODO remover mock de notícias
-        List<News> news =  new ArrayList<>();
-        news.add(new News("Ferroviária Tem Desfalque Importante", "Lorazepam, sold under the brand name Ativan among others, is a benzodiazepine medication. It is used to treat anxiety..."));
-        news.add(new News("Ferrinha Joga no Sábado", "Lorazepam, sold under the brand name Ativan among others, is a benzodiazepine medication. It is used to treat anxiety..."));
-        news.add(new News("Copa do Mundo Feminina Está Iniciando", "Lorazepam, sold under the brand name Ativan among others, is a benzodiazepine medication. It is used to treat anxiety..."));
+        api = retrofit.create(SoccerNewsApi.class);
+        this.findNews();
 
-        this.news.setValue(news);
+    }
 
+    private void findNews() {
+        api.getNews().enqueue(new Callback<List<News>>() {
+            @Override
+            public void onResponse(Call<List<News>> call, Response<List<News>> response) {
+                if (response.isSuccessful()){
+                    news.setValue(response.body());
+                }
+                else {
+                    //TODO  Pensar em uma estratégia de tratamento de erros.
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<News>> call, Throwable t) {
+                //TODO  Pensar em uma estratégia de tratamento de erros.
+            }
+        });
     }
 
     public LiveData<List<News>> getNews() {
