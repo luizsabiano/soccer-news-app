@@ -1,12 +1,16 @@
 package br.com.soccernews.ui.news;
 
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.room.Room;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
+import br.com.soccernews.data.local.AppDatabase;
 import br.com.soccernews.data.remote.SoccerNewsApi;
 import br.com.soccernews.domain.News;
 import retrofit2.Call;
@@ -21,6 +25,7 @@ public class NewsViewModel extends ViewModel {
 
     private final SoccerNewsApi api;
 
+
     public NewsViewModel() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://luizsabiano.github.io/mock_handicraft/")
@@ -28,6 +33,7 @@ public class NewsViewModel extends ViewModel {
                 .build();
 
         api = retrofit.create(SoccerNewsApi.class);
+
         this.findNews();
 
     }
